@@ -725,7 +725,7 @@ class AuditReader
      * @param int $newRevision
      * @return array
      */
-    public function diff($className, $id, $oldRevision, $newRevision)
+    public function diff($className, $id, $oldRevision, $newRevision, $showSame = false)
     {
         $oldObject = $this->find($className, $id, $oldRevision);
         $newObject = $this->find($className, $id, $newRevision);
@@ -734,7 +734,7 @@ class AuditReader
         $newValues = $this->getEntityValues($className, $newObject);
 
         $differ = new ArrayDiff();
-        return $differ->diff($oldValues, $newValues);
+        return $differ->diff($oldValues, $newValues, $showSame);
     }
 
     /**

@@ -32,7 +32,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
  */
 class ArrayDiff
 {
-    public function diff($oldData, $newData)
+    public function diff($oldData, $newData, $showSame = false)
     {
         $diff = array();
 
@@ -41,10 +41,12 @@ class ArrayDiff
             $old = array_key_exists($field, $oldData) ? $oldData[$field] : null;
             $new = array_key_exists($field, $newData) ? $newData[$field] : null;
 
-            if ($old == $new) {
-                $row = array('old' => '', 'new' => '', 'same' => $old);
+            if ($old != $new) {
+                $row = array('old' => $old, 'new' => $new, 'same' => false);
+            } else if($showSame) {
+                $row = array('old' => $old, 'new' => $new, 'same' => true);
             } else {
-                $row = array('old' => $old, 'new' => $new, 'same' => '');
+                continue;
             }
 
             $diff[$field] = $row;
