@@ -446,12 +446,13 @@ class AuditedCollection implements Collection
             $params = array();
 
             $sql = 'SELECT MAX('.$this->configuration->getRevisionFieldName().') as rev, ';
-            $sql .= $this->configuration->getRevisionTypeFieldName().' AS revtype, ';
-            $sql .= implode(', ', $this->metadata->getIdentifierColumnNames()).' ';
+            $sql .= 'r.'.$this->configuration->getRevisionTypeFieldName().' AS revtype, ';
+            $sql .= 't.'.implode(', t.', $this->metadata->getIdentifierColumnNames()).' ';
             if (isset($this->associationDefinition['indexBy'])) {
                 $sql .= ', '.$this->associationDefinition['indexBy'].' ';
             }
             $sql .= 'FROM '.$this->configuration->getTablePrefix().$this->metadata->table['name'].$this->configuration->getTableSuffix().' t ';
+            $sql .= 'JOIN '.$this->configuration->getRevisionTableName().' r ON r.id = t.rev ';
             $sql .= 'WHERE '.$this->configuration->getRevisionFieldName().' <= '.$this->revision.' ';
 
             foreach ($this->foreignKeys as $column => $value) {
@@ -499,14 +500,14 @@ class AuditedCollection implements Collection
             $sql .= ' sd.'.$this->configuration->getRevisionFieldName().' <= '.$this->revision;
             $sql .= ' AND sd.'.$this->configuration->getRevisionFieldName().' > t.'.$this->configuration->getRevisionFieldName();
 
-            $sql .= ' AND sd.'.$this->configuration->getRevisionTypeFieldName().' = ?';
+            $sql .= ' AND r.'.$this->configuration->getRevisionTypeFieldName().' = ?';
             $params[] = 'DEL';
 
             $sql .= ') ';
             //end check for deleted revisions older than requested
 
             $sql .= 'GROUP BY '.implode(', ', $this->metadata->getIdentifierColumnNames())./*', '.$this->configuration->getRevisionTypeFieldName().*/' ';
-            $sql .= 'HAVING '.$this->configuration->getRevisionTypeFieldName().' <> ?';
+            $sql .= 'HAVING r.'.$this->configuration->getRevisionTypeFieldName().' <> ?';
             //add rev type parameter
             $params[] = 'DEL';
 

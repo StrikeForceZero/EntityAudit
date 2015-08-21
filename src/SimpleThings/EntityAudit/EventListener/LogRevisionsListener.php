@@ -135,7 +135,7 @@ class LogRevisionsListener implements EventSubscriber
                     'SET '.$field.' = ? '.
                     'WHERE '.$this->config->getRevisionFieldName().' = ? ';
 
-                $params = array($value, $this->getRevisionId());
+                $params = array($value, $this->getRevisionId('UDP'));
 
                 $types = array();
 
@@ -273,12 +273,13 @@ class LogRevisionsListener implements EventSubscriber
         return $data;
     }
 
-    private function getRevisionId()
+    private function getRevisionId($revType)
     {
         if ($this->revisionId === null) {
             $this->conn->insert($this->config->getRevisionTableName(), array(
                 'timestamp'     => date_create('now'),
                 'username'      => $this->config->getCurrentUsername(),
+                $this->config->getRevisionTypeFieldName()      => $revType,
             ), array(
                 Type::DATETIME,
                 Type::STRING
@@ -301,11 +302,11 @@ class LogRevisionsListener implements EventSubscriber
     private function getInsertRevisionSQL($class)
     {
         if (!isset($this->insertRevisionSQL[$class->name])) {
-            $placeholders = array('?', '?');
+            $placeholders = array('?');
             $tableName    = $this->config->getTablePrefix() . $class->table['name'] . $this->config->getTableSuffix();
 
             $sql = "INSERT INTO " . $tableName . " (" .
-                    $this->config->getRevisionFieldName() . ", " . $this->config->getRevisionTypeFieldName();
+                    $this->config->getRevisionFieldName();
 
             $fields = array();
 
@@ -361,7 +362,7 @@ class LogRevisionsListener implements EventSubscriber
      */
     private function saveRevisionEntityData($class, $entityData, $revType)
     {
-        $params = array($this->getRevisionId(), $revType);
+        $params = array($this->getRevisionId($revType));
         $types = array(\PDO::PARAM_INT, \PDO::PARAM_STR);
 
         $fields = array();

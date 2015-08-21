@@ -227,7 +227,7 @@ class AuditReader
             $whereSQL .= " AND e." . $columnName . " = ?";
         }
 
-        $columnList = array('e.'.$this->config->getRevisionTypeFieldName());
+        $columnList = array();
         $columnMap  = array();
 
         foreach ($class->fieldNames as $columnName => $field) {
@@ -290,11 +290,11 @@ class AuditReader
             throw new NoRevisionFoundException($class->name, $id, $revision);
         }
 
-        if ($options['threatDeletionsAsExceptions'] && $row[$this->config->getRevisionTypeFieldName()] == 'DEL') {
+        if ($options['threatDeletionsAsExceptions'] && $this->findRevision($revision)->getRevType() == 'DEL') {
             throw new DeletedException($class->name, $id, $revision);
         }
 
-        unset($row[$this->config->getRevisionTypeFieldName()]);
+        //unset($row[$this->config->getRevisionTypeFieldName()]);
 
         return $this->createEntity($class->name, $row, $revision);
     }
@@ -534,7 +534,7 @@ class AuditReader
             $params = array();
 
             $whereSQL   = "e." . $this->config->getRevisionFieldName() ." = ?";
-            $columnList = "e." . $this->config->getRevisionTypeFieldName();
+            $columnList = "";//"e." . $this->config->getRevisionTypeFieldName();
             $params[] = $revision;
             $columnMap  = array();
 
@@ -585,7 +585,7 @@ class AuditReader
                 }
 
                 $entity = $this->createEntity($className, $row, $revision);
-                $changedEntities[] = new ChangedEntity($className, $id, $row[$this->config->getRevisionTypeFieldName()], $entity);
+                $changedEntities[] = new ChangedEntity($className, $id, $this->findRevision($revision)->getRevType(), $entity);
             }
         }
         return $changedEntities;
@@ -607,7 +607,8 @@ class AuditReader
             return new Revision(
                 $revisionsData[0]['id'],
                 \DateTime::createFromFormat($this->platform->getDateTimeFormatString(), $revisionsData[0]['timestamp']),
-                $revisionsData[0]['username']
+                $revisionsData[0]['username'],
+                $revisionsData[0][$this->config->getRevisionTypeFieldName()]
             );
         } else {
             throw new InvalidRevisionException($rev);

@@ -87,7 +87,6 @@ class CreateSchemaListener implements EventSubscriber
             ));
         }
         $revisionTable->addColumn($this->config->getRevisionFieldName(), $this->config->getRevisionIdFieldType());
-        $revisionTable->addColumn($this->config->getRevisionTypeFieldName(), 'string', array('length' => 4));
         if (!in_array($cm->inheritanceType, array(ClassMetadataInfo::INHERITANCE_TYPE_NONE, ClassMetadataInfo::INHERITANCE_TYPE_JOINED, ClassMetadataInfo::INHERITANCE_TYPE_SINGLE_TABLE))) {
             throw new \Exception(sprintf('Inheritance type "%s" is not yet supported', $cm->inheritanceType));
         }
@@ -106,6 +105,7 @@ class CreateSchemaListener implements EventSubscriber
         ));
         $revisionsTable->addColumn('timestamp', 'datetime');
         $revisionsTable->addColumn('username', 'string');
+        $revisionsTable->addColumn($this->config->getRevisionTypeFieldName(), 'string', array('length' => 4));
         $revisionsTable->setPrimaryKey(array('id'));
     }
 }
