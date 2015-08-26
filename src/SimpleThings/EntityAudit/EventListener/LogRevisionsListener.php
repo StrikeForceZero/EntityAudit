@@ -363,7 +363,7 @@ class LogRevisionsListener implements EventSubscriber
     private function saveRevisionEntityData($class, $entityData, $revType)
     {
         $params = array($this->getRevisionId($revType));
-        $types = array(\PDO::PARAM_INT, \PDO::PARAM_STR);
+        $types = array(\PDO::PARAM_INT);
 
         $fields = array();
 
