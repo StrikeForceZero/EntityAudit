@@ -497,7 +497,8 @@ class AuditReader
             $revisions[] = new Revision(
                 $row['id'],
                 \DateTime::createFromFormat($this->platform->getDateTimeFormatString(), $row['timestamp']),
-                $row['username']
+                $row['username'],
+                $row['revtype']
             );
         }
         return $revisions;
@@ -660,7 +661,8 @@ class AuditReader
             $revisions[] = new Revision(
                 $row['id'],
                 \DateTime::createFromFormat($this->platform->getDateTimeFormatString(), $row['timestamp']),
-                $row['username']
+                $row['username'],
+                $row['revtype']
             );
         }
 
