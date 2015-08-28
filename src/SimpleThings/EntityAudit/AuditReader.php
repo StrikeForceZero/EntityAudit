@@ -535,7 +535,7 @@ class AuditReader
             $params = array();
 
             $whereSQL   = "e." . $this->config->getRevisionFieldName() ." = ?";
-            $columnList = "";//"e." . $this->config->getRevisionTypeFieldName();
+            $columnList = "e.rev";
             $params[] = $revision;
             $columnMap  = array();
 
